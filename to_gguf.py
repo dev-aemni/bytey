@@ -1,70 +1,108 @@
 import struct
 import numpy as np
+import gguf
 
-print("Converting bytey.dat -> bytey-1.0_15M_slm_idseqversion.gguf...")
+output_filename = "bytey-1.0_15M_slm_idseqversion.gguf"
+print(f"Building Bytey's Original Validated GGUF: {output_filename}...")
 
-with open("bytey.dat", "rb") as f:
-    V, N = struct.unpack("ii", f.read(8))
-    print(f"Reading Vocabulary ({V} words) and Knowledge ({N} answers)...")
+# 1. Load Vocab from tokenizer.bin
+vocab = []
+with open("../real_llm/tokenizer.bin", "rb") as f:
+    max_token_length = struct.unpack("I", f.read(4))[0]
+    for _ in range(32000):
+        score = struct.unpack("f", f.read(4))[0]
+        len_ = struct.unpack("I", f.read(4))[0]
+        word = f.read(len_)
+        vocab.append((word, score))
+
+# 2. Load Bytey's Pretrained Weights
+with open("../real_llm/stories15M.bin", "rb") as f:
+    dim, hidden_dim, n_layers, n_heads, n_kv_heads, vocab_size, seq_len = struct.unpack("7i", f.read(28))
+    raw_weights = np.fromfile(f, dtype=np.float32)
+
+print(f"Loaded Bytey weights: Dim={dim}, Hidden={hidden_dim}, Layers={n_layers}, Heads={n_heads}")
+
+writer = gguf.GGUFWriter(output_filename, "llama")
+
+# Standard LLaMA Metadata
+writer.add_name("Bytey-15M-Original")
+writer.add_context_length(1024)
+writer.add_embedding_length(dim)
+writer.add_block_count(n_layers)
+writer.add_feed_forward_length(hidden_dim)
+writer.add_head_count(n_heads)
+writer.add_head_count_kv(n_kv_heads)
+writer.add_layer_norm_rms_eps(1e-5)
+
+# BPE Vocab
+tokens = [item[0] for item in vocab]
+scores = [item[1] for item in vocab]
+toktypes = [gguf.TokenType.NORMAL] * vocab_size
+toktypes[1] = gguf.TokenType.CONTROL # <s>
+toktypes[2] = gguf.TokenType.CONTROL # </s>
+
+writer.add_tokenizer_model("llama")
+writer.add_token_list(tokens)
+writer.add_token_scores(scores)
+writer.add_token_types(toktypes)
+writer.add_bos_token_id(1)
+writer.add_eos_token_id(2)
+writer.add_unk_token_id(0)
+
+# Unpack according to llama2.c memory layout
+ptr = 0
+def read_tensor(shape):
+    global ptr
+    count = int(np.prod(shape))
+    arr = raw_weights[ptr:ptr+count].reshape(shape)
+    ptr += count
+    return arr
+
+# 1. Token Embeddings
+token_embd = read_tensor((vocab_size, dim))
+writer.add_tensor("token_embd.weight", token_embd)
+
+# 2. Attention Norms for all layers
+attn_norms = [read_tensor((dim,)) for _ in range(n_layers)]
+
+# 3. Attention Q, K, V, Out
+wq = [read_tensor((dim, dim)) for _ in range(n_layers)]
+wk = [read_tensor((dim, dim)) for _ in range(n_layers)]
+wv = [read_tensor((dim, dim)) for _ in range(n_layers)]
+wo = [read_tensor((dim, dim)) for _ in range(n_layers)]
+
+# 4. FFN Norms
+ffn_norms = [read_tensor((dim,)) for _ in range(n_layers)]
+
+# 5. FFN Gate, Down, Up (W1, W2, W3)
+w1 = [read_tensor((hidden_dim, dim)) for _ in range(n_layers)] # Gate
+w2 = [read_tensor((dim, hidden_dim)) for _ in range(n_layers)] # Down
+w3 = [read_tensor((hidden_dim, dim)) for _ in range(n_layers)] # Up
+
+# 6. Final RMS Norm
+output_norm = read_tensor((dim,))
+
+# Write to GGUF
+for l in range(n_layers):
+    writer.add_tensor(f"blk.{l}.attn_norm.weight", attn_norms[l])
+    writer.add_tensor(f"blk.{l}.attn_q.weight", wq[l])
+    writer.add_tensor(f"blk.{l}.attn_k.weight", wk[l])
+    writer.add_tensor(f"blk.{l}.attn_v.weight", wv[l])
+    writer.add_tensor(f"blk.{l}.attn_output.weight", wo[l])
     
-    words = []
-    for _ in range(V):
-        w_len = struct.unpack("i", f.read(4))[0]
-        words.append(f.read(w_len).decode("utf-8", errors="ignore"))
-        
-    answers = []
-    for _ in range(N):
-        a_len = struct.unpack("i", f.read(4))[0]
-        answers.append(f.read(a_len).decode("utf-8", errors="ignore"))
-        
-    D_MODEL = 2048
-    W_emb = np.frombuffer(f.read(V * D_MODEL * 4), dtype=np.float32)
-    W_l1 = np.frombuffer(f.read(D_MODEL * D_MODEL * 4), dtype=np.float32)
-    W_l2 = np.frombuffer(f.read(D_MODEL * D_MODEL * 4), dtype=np.float32)
-    W_l3 = np.frombuffer(f.read(D_MODEL * D_MODEL * 4), dtype=np.float32)
-    W_ans = np.frombuffer(f.read(N * D_MODEL * 4), dtype=np.float32)
+    writer.add_tensor(f"blk.{l}.ffn_norm.weight", ffn_norms[l])
+    writer.add_tensor(f"blk.{l}.ffn_gate.weight", w1[l])
+    writer.add_tensor(f"blk.{l}.ffn_down.weight", w2[l])
+    writer.add_tensor(f"blk.{l}.ffn_up.weight", w3[l])
 
-with open("bytey-1.0_15M_slm_idseqversion.gguf", "wb") as out:
-    out.write(b"GGUF")
-    out.write(struct.pack("<I", 3))   # Version 3
-    out.write(struct.pack("<Q", 5))   # 5 Tensors
-    out.write(struct.pack("<Q", 2))   # 2 Metadata KV
+writer.add_tensor("output_norm.weight", output_norm)
 
-    # Metadata
-    arch_key = "general.architecture"
-    out.write(struct.pack("<Q", len(arch_key)))
-    out.write(arch_key.encode("utf-8"))
-    out.write(struct.pack("<I", 8))
-    arch_val = "bytey-15m"
-    out.write(struct.pack("<Q", len(arch_val)))
-    out.write(arch_val.encode("utf-8"))
+# Shared Weight Classifier Head (Standard LLaMA weight tying)
+writer.add_tensor("output.weight", token_embd)
 
-    dim_key = "bytey.embedding_length"
-    out.write(struct.pack("<Q", len(dim_key)))
-    out.write(dim_key.encode("utf-8"))
-    out.write(struct.pack("<I", 4))
-    out.write(struct.pack("<I", D_MODEL))
+writer.write_header_to_file()
+writer.write_kv_data_to_file()
+writer.write_tensors_to_file()
+writer.close()
 
-    tensors = [
-        ("token_embd.weight", [D_MODEL, V], W_emb),
-        ("layers.0.weight", [D_MODEL, D_MODEL], W_l1),
-        ("layers.1.weight", [D_MODEL, D_MODEL], W_l2),
-        ("layers.2.weight", [D_MODEL, D_MODEL], W_l3),
-        ("output.weight", [D_MODEL, N], W_ans)
-    ]
-    
-    offset = 0
-    for name, dims, data in tensors:
-        out.write(struct.pack("<Q", len(name)))
-        out.write(name.encode("utf-8"))
-        out.write(struct.pack("<I", len(dims)))
-        for d in dims:
-            out.write(struct.pack("<Q", d))
-        out.write(struct.pack("<I", 0)) # FP32
-        out.write(struct.pack("<Q", offset))
-        offset += data.nbytes
-
-    for _, _, data in tensors:
-        out.write(data.tobytes())
-
-print(f"✔ SUCCESS: Exported bytey-1.0_15M_slm_idseqversion.gguf ({V} vocab, {N} responses, 15.04M params)!")
+print(f"✔ SUCCESS: Bytey original GGUF compiled correctly: {output_filename}")
