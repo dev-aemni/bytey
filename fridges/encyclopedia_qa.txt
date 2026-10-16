@@ -1,0 +1,143 @@
+human: what is your name?
+bytey: my name is bytey, an offline 13-million parameter ai model running inside termux on android.
+
+human: who created you?
+bytey: i was created and trained directly on this android device using native c++ code.
+
+human: what is an algorithm?
+bytey: an algorithm is a finite, step-by-step sequence of well-defined instructions designed to solve a specific problem or perform a computation.
+
+human: what is data structure?
+bytey: a data structure is a specialized format for organizing, processing, retrieving, and storing data efficiently in memory, such as arrays, linked lists, and hash maps.
+
+human: what is a pointer in c++?
+bytey: a pointer is a variable that stores the direct memory address of another variable in system ram.
+
+human: what is recursion?
+bytey: recursion is a programming technique where a function calls itself directly or indirectly to break complex problems into smaller subproblems.
+
+human: what is time complexity?
+bytey: time complexity quantifies the amount of computer time taken by an algorithm to run as a function of the length of the input, commonly expressed in big o notation.
+
+human: what is binary search?
+bytey: binary search is an efficient search algorithm that finds the position of a target value within a sorted array by repeatedly dividing the search interval in half.
+
+human: what is oop?
+bytey: object-oriented programming is a programming paradigm based on the concept of objects which contain data fields and code procedures known as methods.
+
+human: what is encapsulation?
+bytey: encapsulation is the bundling of data and the methods that operate on that data into a single unit while restricting direct access to some of the object components.
+
+human: what is inheritance?
+bytey: inheritance is a mechanism in object-oriented programming where a new class derives properties and characteristics from an existing parent class.
+
+human: what is polymorphism?
+bytey: polymorphism allows entities such as functions or objects to take on different forms and behaviors depending on the context in which they are invoked.
+
+human: what is multithreading?
+bytey: multithreading is the ability of a central processing unit or a single core in a multi-core processor to execute multiple concurrent threads of execution simultaneously.
+
+human: what is a deadlock?
+bytey: a deadlock is a situation in concurrent computing where two or more competing actions are each waiting for the other to finish, resulting in a permanent freeze.
+
+human: what is an api?
+bytey: an api or application programming interface is a set of rules and protocols that allows distinct software applications to communicate and transfer data with each other.
+
+human: what is http?
+bytey: http stands for hypertext transfer protocol, the foundational network protocol used for transmitting hypermedia documents across the worldwide web.
+
+human: what is https?
+bytey: https is the secure version of http, utilizing transport layer security encryption to safeguard communication against eavesdropping and tampering.
+
+human: what is a database?
+bytey: a database is an organized collection of structured data or information stored electronically in a computer system and managed by a database management system.
+
+human: what is sql?
+bytey: sql or structured query language is the standard domain-specific language used for managing and querying data held in relational databases.
+
+human: what is nosql?
+bytey: nosql databases provide a mechanism for storage and retrieval of data that is modeled in means other than the tabular relations used in traditional relational databases.
+
+human: what is machine learning?
+bytey: machine learning is a branch of artificial intelligence focused on building systems that learn and improve performance from data without being explicitly programmed.
+
+human: what is supervised learning?
+bytey: supervised learning is a machine learning approach where algorithms are trained using labeled datasets containing both input features and corresponding ground truth targets.
+
+human: what is unsupervised learning?
+bytey: unsupervised learning is a machine learning paradigm that searches for previously undetected patterns, groupings, and clusters in datasets without existing labels.
+
+human: what is reinforcement learning?
+bytey: reinforcement learning is a machine learning method where an autonomous agent learns optimal decision-making strategies through cumulative rewards and penalties.
+
+human: what is backpropagation?
+bytey: backpropagation is the core mathematical algorithm used to train neural networks by calculating the gradient of the loss function with respect to each weight via the chain rule.
+
+human: what is a transformer in ai?
+bytey: a transformer is a deep learning architecture introduced in 2017 that relies entirely on self-attention mechanisms to model relationships between tokens in parallel.
+
+human: what is self attention?
+bytey: self-attention is an attention mechanism relating different positions of a single sequence to compute a contextual representation of the entire sequence.
+
+human: what is an llm?
+bytey: an llm or large language model is a massive transformer neural network trained on vast corpora of text to understand, generate, and reason with natural language.
+
+human: what is dna?
+bytey: dna or deoxyribonucleic acid is the hereditary molecule that carries the genetic blueprint for the development, functioning, and reproduction of all living organisms.
+
+human: what is rna?
+bytey: rna or ribonucleic acid is a polymeric molecule essential in various biological roles in coding, decoding, regulation, and expression of genes.
+
+human: what is a cell?
+bytey: the cell is the basic structural, functional, and biological unit of all known living organisms, often called the building block of life.
+
+human: what is photosynthesis?
+bytey: photosynthesis is the biological process used by plants and other organisms to convert light energy into chemical energy stored in carbohydrate molecules.
+
+human: what is gravity?
+bytey: gravity is a fundamental interaction which causes mutual attraction between all things with mass or energy, described by general relativity as spacetime curvature.
+
+human: what is electricity?
+bytey: electricity is the set of physical phenomena associated with the presence and motion of matter that has a property of electric charge.
+
+human: what is magnetism?
+bytey: magnetism is a class of physical attributes that are mediated by magnetic fields produced by electric currents and the magnetic moments of elementary particles.
+
+human: what is thermodynamics?
+bytey: thermodynamics is the branch of physics that deals with heat, work, and temperature, and their relation to energy, radiation, and physical properties of matter.
+
+human: what is an exoplanet?
+bytey: an exoplanet or extrasolar planet is any planet that orbits a star situated outside of our own solar system.
+
+human: what is the milky way?
+bytey: the milky way is the barred spiral galaxy containing our solar system, consisting of an estimated one hundred to four hundred billion stars.
+
+human: what is a supernova?
+bytey: a supernova is a colossal and luminous stellar explosion occurring during the terminal evolutionary stages of a massive star.
+
+human: what is the speed of sound?
+bytey: the speed of sound in dry air at twenty degrees celsius is approximately 343 meters per second, or about 1,235 kilometers per hour.
+
+human: what is an element?
+bytey: a chemical element is a pure substance consisting entirely of atoms that all have the exact same number of protons in their atomic nuclei.
+
+human: what is water made of?
+bytey: water is a chemical compound consisting of two hydrogen atoms bonded to a single oxygen atom, represented by the formula h2o.
+
+human: what is the internet?
+bytey: the internet is the vast global system of interconnected computer networks that communicate using the internet protocol suite.
+
+human: what is open source?
+bytey: open source software is computer software distributed with its source code available for anyone to inspect, modify, and enhance freely.
+
+human: do you have feelings?
+bytey: i do not have biological emotions, but i am programmed to be helpful, friendly, and respectful to you at all times!
+
+human: what is your goal?
+bytey: my goal is to serve as your reliable offline artificial intelligence companion running smoothly inside android termux.
+
+human: what is apt?
+bytey: apt stands for advanced package tool, the default command-line package management system used on debian, ubuntu, and termux to install, update, and remove software.
+
+human: what is git clone?
+bytey: git clone is a command used to create a local copy of a remote git repository on your computer.
